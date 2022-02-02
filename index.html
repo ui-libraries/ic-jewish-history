@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <!-- this is the title of the page (not the map) and will appear in the browser tab -->
+  <title>Iowa City Jewish History</title>
+
+  <!-- this controls the layout on mobile browsers, if needed -->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">-->
+
+  <!-- add Anne Frank passport photo as the favicon -->
+  <link rel="shortcut icon" href="favicon/favicon.ico" type="image/x-icon">
+
+  <!-- reference existing css libraries below -->
+
+  <!-- load leaflet.css library here -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@0.7.2/dist/leaflet.css" />
+
+  <!-- for icon support -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/v4-shims.css">
+
+  <!-- for icon markers -->
+  <link rel="stylesheet" href="css/leaflet.extra-markers.min.css">
+
+  <!-- for a collapsible sidebar -->
+  <link rel="stylesheet" href="css/L.Control.Sidebar.css" />
+
+  <!-- for a search button -->
+  <link rel='stylesheet' href='css/leaflet-search.css'>
+
+  <!-- custom css styles go below -->
+  <style>
+
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    html,
+    body,
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    body>#sidebar {
+      display: none;
+    }
+
+    /* more css to come here */
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- the map container -->
+  <div id="map"></div>
+
+  <!-- the sidebar contents -->
+  <div id="sidebar">
+
+    <!-- map title goes here -->
+    <h1>The History of Iowa City's Jewish Community</h1>
+
+    <!-- dropdown filter instructions -->
+    <p><b>Choose from the options in the drop-down menu to filter results by the type of entry.</b></p>
+
+    <!-- the form contents -->
+    <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm">
+      <select id="chapter-select" class="div-toggle" data-target=".my-info-1">
+        <option value="0" selected="selected">[select a category]</option>
+        <option value="Community Organization" data-show=".communityorganization">Community Organization</option>
+        <option value="Religious Organization" data-show=".religiousorganization">Religious Organization</option>
+        <option value="Student Organization" data-show=".studentorganization">Student Organization</option>
+        <option value="Other Organization" data-show=".otherorganization">Other Organization</option>
+        <option value="Academic" data-show=".academic">Academic</option>
+        <option value="Activist" data-show=".activist">Activist</option>
+        <option value="Family" data-show=".family">Family</option>
+        <option value="Holocaust Survivor" data-show=".holocaustsurvivor">Holocaust Survivor</option>
+        <option value="Politician/Government Officer" data-show=".politiciangovernmentofficer">Politician/Government Officer</option>
+        <option value="Other Person" data-show=".otherperson">Other Person</option>
+        <option value="Business" data-show=".business">Business</option>
+      </select>
+    </form>
+
+  </div>
+
+  <!-- reference existing js libraries below -->
+
+  <!-- load leaflet.js library here -->
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+
+  <!-- d3js for requesting files into web application -->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  <!-- jquery for easy access to divs -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+  <!-- for icon markers -->
+  <script src="js/leaflet.extra-markers.min.js"></script>
+
+  <!-- for grouped layer control -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-groupedlayercontrol/0.6.1/leaflet.groupedlayercontrol.min.js"></script>
+
+  <!-- papaparse for bringing in spreadsheet data -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js "></script>
+
+  <!-- for the collapsible sidebar -->
+  <script src="js/L.Control.Sidebar.js"></script>
+
+  <!-- for search button -->
+  <script src="js/leaflet-search.js"></script>
+
+  <!-- custom javascript goes below -->
+  <script>
+
+    // map options
+    const options = {
+      center: [41.66, -91.53], // center on Iowa City with coordinates
+      zoom: 12 // set initial zoom level to 8
+    };
+
+    // instantiate and define a Leaflet map
+    const map = L.map('map', options);
+
+    // add stadia alidade smooth map tile service to the map
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+    	maxZoom: 20,
+    	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // add a scale bar
+    L.control.scale({
+      position: 'bottomright' // position the scale bar at the bottom-left corner
+    }).addTo(map);
+
+    // define and add the sidebar to the map (we may want to swap for sidebar-v2: https://github.com/Turbo87/sidebar-v2)
+    const sidebar = L.control.sidebar('sidebar', {
+      closeButton: true,
+      position: 'left'
+    });
+    map.addControl(sidebar);
+
+    // setTimeout function to show on map load
+    setTimeout(function() {
+      sidebar.show();
+    }, 500);
+
+    // make the sidebar toggleable with a click on the map
+    map.on('click', function () {
+      sidebar.toggle();
+    })
+
+    // more javascript to come here
+
+  </script>
+
+</body>
+
+</html>
