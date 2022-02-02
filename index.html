@@ -160,8 +160,57 @@
     // show sidebar content on map load
     sidebar.open('home');
 
-    // more javascript to come here
+    // creates a red marker with a question mark icon
+    const queryMarker = L.ExtraMarkers.icon({
+      icon: 'fa-question-circle',
+      markerColor: 'red',
+      shape: 'square',
+      prefix: 'fas'
+    });
 
+    // use papa parse to access and process spreadsheet data
+    Papa.parse('data/IC_JewishHistory_Sample.csv', {
+      header: true, // make sure it knows the first row is a header
+      download: true,
+      dynamicTyping: true,
+      skipEmptyLines: true,
+
+      // upon completion...
+      complete: function(results) {
+
+        // sort through each entry
+        results.data.forEach((entry) => {
+
+          // create features in geojson format
+          feature = {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [entry.X, entry.Y] // add longitude and latitude
+            },
+            "properties": entry // feed all csv columns as properties
+          }
+
+          // define a marker (this will be diversified based on category later)
+          marker = L.geoJSON(feature, {
+            pointToLayer: function(feature, ll) {
+              return L.marker(ll, {
+                icon: queryMarker // identify "icon" as the marker defined above
+              });
+            },
+            onEachFeature: function(feature, layer) {
+              const props = layer.feature.properties; // define the properties of each feature for easier access
+              console.log(props); // verify in the web developer console
+              // bind popup content to each marker
+              layer.bindPopup('<b>' + props.Name + '</b><br>' + props.Site + '<br>' + props['Address (Number, Street, Town, State, Zip)'] + '<br><br><b>Site Description:</b><br>' + props['Site Description'] +
+                '<br><br><b>History & Importance:</b><br>' + props['History and Importance to Project and Community']);
+            }
+          }).addTo(map); // add the markers to the map
+        })
+      }
+    });
+
+    // more javascript to come here
   </script>
 
 </body>
