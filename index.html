@@ -26,14 +26,13 @@
   <link rel="stylesheet" href="css/leaflet.extra-markers.min.css">
 
   <!-- for a collapsible sidebar -->
-  <link rel="stylesheet" href="css/L.Control.Sidebar.css" />
+  <link rel="stylesheet" href="css/leaflet-sidebar.css" />
 
   <!-- for a search button -->
   <link rel='stylesheet' href='css/leaflet-search.css'>
 
   <!-- custom css styles go below -->
   <style>
-
     body {
       padding: 0;
       margin: 0;
@@ -43,52 +42,69 @@
     body,
     #map {
       height: 100%;
-      width: 100%;
+      /*width: 100%;*/
+      font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
     }
 
-    body>#sidebar {
-      display: none;
+    .lorem {
+      font-style: italic;
+      color: #AAA;
     }
 
     /* more css to come here */
-
   </style>
 
 </head>
 
 <body>
 
-  <!-- the map container -->
-  <div id="map"></div>
+  <!-- the sidebar div -->
+  <div id="sidebar" class="sidebar collapsed">
+    <!-- Nav tabs -->
+    <div class="sidebar-tabs">
+      <ul role="tablist">
+        <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+      </ul>
+    </div>
 
-  <!-- the sidebar contents -->
-  <div id="sidebar">
+    <!-- the sidebar contents -->
+    <div class="sidebar-content">
+      <div class="sidebar-pane" id="home">
 
-    <!-- map title goes here -->
-    <h1>The History of Iowa City's Jewish Community</h1>
+        <!-- map title goes here -->
+        <h1 class="sidebar-header">
+          Iowa City's Jewish History
+          <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+        </h1>
 
-    <!-- dropdown filter instructions -->
-    <p><b>Choose from the options in the drop-down menu to filter results by the type of entry.</b></p>
+        <!-- dropdown filter instructions -->
+        <p><b>Choose from the options in the drop-down menu to filter results by the type of entry.</b></p>
 
-    <!-- the form contents -->
-    <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm">
-      <select id="chapter-select" class="div-toggle" data-target=".my-info-1">
-        <option value="0" selected="selected">[select a category]</option>
-        <option value="Community Organization" data-show=".communityorganization">Community Organization</option>
-        <option value="Religious Organization" data-show=".religiousorganization">Religious Organization</option>
-        <option value="Student Organization" data-show=".studentorganization">Student Organization</option>
-        <option value="Other Organization" data-show=".otherorganization">Other Organization</option>
-        <option value="Academic" data-show=".academic">Academic</option>
-        <option value="Activist" data-show=".activist">Activist</option>
-        <option value="Family" data-show=".family">Family</option>
-        <option value="Holocaust Survivor" data-show=".holocaustsurvivor">Holocaust Survivor</option>
-        <option value="Politician/Government Officer" data-show=".politiciangovernmentofficer">Politician/Government Officer</option>
-        <option value="Other Person" data-show=".otherperson">Other Person</option>
-        <option value="Business" data-show=".business">Business</option>
-      </select>
-    </form>
+        <!-- the form contents -->
+        <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm">
+          <select id="chapter-select" class="div-toggle" data-target=".my-info-1">
+            <option value="0" selected="selected">[select a category]</option>
+            <option value="Community Organization" data-show=".communityorganization">Community Organization</option>
+            <option value="Religious Organization" data-show=".religiousorganization">Religious Organization</option>
+            <option value="Student Organization" data-show=".studentorganization">Student Organization</option>
+            <option value="Other Organization" data-show=".otherorganization">Other Organization</option>
+            <option value="Academic" data-show=".academic">Academic</option>
+            <option value="Activist" data-show=".activist">Activist</option>
+            <option value="Family" data-show=".family">Family</option>
+            <option value="Holocaust Survivor" data-show=".holocaustsurvivor">Holocaust Survivor</option>
+            <option value="Politician/Government Officer" data-show=".politiciangovernmentofficer">Politician/Government Officer</option>
+            <option value="Other Person" data-show=".otherperson">Other Person</option>
+            <option value="Business" data-show=".business">Business</option>
+          </select>
+        </form>
 
+      </div>
+
+    </div>
   </div>
+
+  <!-- the map container -->
+  <div id="map" class="sidebar-map"></div>
 
   <!-- reference existing js libraries below -->
 
@@ -111,17 +127,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js "></script>
 
   <!-- for the collapsible sidebar -->
-  <script src="js/L.Control.Sidebar.js"></script>
+  <script src="js/leaflet-sidebar.js"></script>
 
   <!-- for search button -->
   <script src="js/leaflet-search.js"></script>
 
   <!-- custom javascript goes below -->
   <script>
-
     // map options
     const options = {
-      center: [41.66, -91.53], // center on Iowa City with coordinates
+      center: [41.66, -91.60], // center on Iowa City with coordinates
       zoom: 12 // set initial zoom level to 8
     };
 
@@ -130,8 +145,8 @@
 
     // add stadia alidade smooth map tile service to the map
     L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
-    	maxZoom: 20,
-    	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+      maxZoom: 20,
+      attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     // add a scale bar
@@ -140,21 +155,10 @@
     }).addTo(map);
 
     // define and add the sidebar to the map (we may want to swap for sidebar-v2: https://github.com/Turbo87/sidebar-v2)
-    const sidebar = L.control.sidebar('sidebar', {
-      closeButton: true,
-      position: 'left'
-    });
-    map.addControl(sidebar);
+    const sidebar = L.control.sidebar('sidebar').addTo(map);
 
-    // setTimeout function to show on map load
-    setTimeout(function() {
-      sidebar.show();
-    }, 500);
-
-    // make the sidebar toggleable with a click on the map
-    map.on('click', function () {
-      sidebar.toggle();
-    })
+    // show sidebar content on map load
+    sidebar.open('home');
 
     // more javascript to come here
 
