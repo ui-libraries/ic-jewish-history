@@ -350,6 +350,9 @@
         // empty the chapterContent array
         chapterContent.length = 0;
 
+        // clear the content-info div
+        info.innerHTML = chapterContent.join("");
+
         // empty the chapterSelected array
         chapterSelected.length = 0;
 
@@ -400,8 +403,6 @@
           } else {
             // or remove it from the map if there is no match
             selectedLayers.removeLayer(layer);
-            // empty the chapterContent array
-            chapterContent.length = 0;
           }
 
         });
