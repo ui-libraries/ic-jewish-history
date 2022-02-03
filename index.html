@@ -7,7 +7,7 @@
   <title>Iowa City Jewish History</title>
 
   <!-- this controls the layout on mobile browsers, if needed -->
-  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <!-- add Anne Frank passport photo as the favicon -->
   <link rel="shortcut icon" href="favicon/favicon.ico" type="image/x-icon">
@@ -71,6 +71,61 @@
     .resize {
       width: 300px;
       height: auto;
+    }
+
+    p {
+      font-size: 12px;
+    }
+
+    h2 {
+      font-size: 13px;
+      margin-bottom: 0px;
+      margin-top: 0px;
+    }
+
+    h3 {
+      font-size: 12px;
+      font-weight: normal;
+      margin-bottom: 0px;
+      margin-top: 0px;
+    }
+
+    .br {
+      display: block;
+      margin-bottom: 0em;
+    }
+
+    .brmedium {
+      display: block;
+      margin-bottom: 1em;
+    }
+
+    @media (max-width: 1000px) {
+      .sidebar-header {
+        font-size: 15px;
+      }
+
+      p {
+        font-size: 11px;
+      }
+
+      h2 {
+        font-size: 12px;
+        margin-bottom: 0px;
+        margin-top: 0px;
+      }
+
+      h3 {
+        font-size: 11px;
+        font-weight: normal;
+        margin-bottom: 0px;
+        margin-top: 0px;
+      }
+
+      .resize {
+        width: 200px;
+        height: auto;
+      }
     }
 
     /* more css to come here */
@@ -272,8 +327,8 @@
         // on each marker, bind popup content
         onEachFeature: function(feature, layer) {
           const props = feature.properties;
-          layer.bindPopup('<b>' + props.Name + '</b><br>' + props.Category + '<br><hr>' + props.Site + '<br>' + props['Address (Number, Street, Town, State, Zip)'] + '<br><br><b>Site Description:</b><br>' + props['Site Description'] +
-            '<br><br><b>History & Importance:</b><br>' + props['History and Importance to Project and Community']);
+          layer.bindPopup('<b><h2>' + props.Name + "</h2></b><span class='br'></span><h3>" + props.Category + '<hr>' + props.Site + "<span class='br'></span>" + props['Address (Number, Street, Town, State, Zip)'] + "</h3><span class='brmedium'></span><b><h2>Site Description:</h2></b><span class='br'></span><h3>" + props['Site Description'] +
+            "</h3><span class='brmedium'></span><b><h2>History & Importance:</h2></b><span class='br'></span><h3>" + props['History and Importance to Project and Community'] + '</h3>');
         }
 
       });
@@ -318,9 +373,9 @@
               otherImage = otherImage || undefined;
 
           if (siteImage != undefined && otherImage === undefined) {
-            var imgContent = "<br><img class='resize' src='" + props['Media (Site Image)'] + "'" + "/>";
+            var imgContent = "<span class='brmedium'></span><img class='resize' src='" + props['Media (Site Image)'] + "'" + "/>";
           } else if (siteImage === undefined && otherImage != undefined) {
-            var imgContent = "<br><img class='resize' src='" + props['Media (Other Image)'] + "'" + "/>";
+            var imgContent = "<span class='brmedium'></span><img class='resize' src='" + props['Media (Other Image)'] + "'" + "/>";
           } else {
             var imgContent = "";
           };
@@ -330,16 +385,16 @@
             // and add it to the map in case of a match
             selectedLayers.addLayer(layer);
             // push content to the chapterContent array
-            chapterContent.push("<div class='story' data-point='" + props.Y + "," + props.X + "'><br><b>" + props.Name + "</b><br>" + props.Category + "<br>" + props.Site + "<br>" + props['Address (Number, Street, Town, State, Zip)'] + "<br><br><b>Site Description:</b><br>" + props['Site Description'] +
-              "<br><br><b>History & Importance:</b><br>" + props['History and Importance to Project and Community'] + "<br>" + imgContent + "</div>");
+            chapterContent.push("<div class='story' data-point='" + props.Y + "," + props.X + "'><br><b><h2>" + props.Name + "</h2></b><span class='br'></span><h3>" + props.Category + "<span class='br'></span>" + props.Site + "<span class='br'></span>" + props['Address (Number, Street, Town, State, Zip)'] + "</h3><span class='brmedium'></span><b><h2>Site Description:</h2></b><span class='br'></span><h3>" + props['Site Description'] +
+              "</h3><span class='brmedium'></span><b><h2>History & Importance:</h2></b><span class='br'></span><h3>" + props['History and Importance to Project and Community'] + '</h3>' + imgContent + "</div>");
             // redefine the div
             info.innerHTML = chapterContent.join("<hr>");
           } else if (chapterSelected[0] == 0) {
             // or add all if "All" is selected
             selectedLayers.addLayer(layer);
             // push content to the chapterContent array
-            chapterContent.push("<div class='story' data-point='" + props.Y + "," + props.X + "'><br><b>" + props.Name + "</b><br>" + props.Category + "<br>" + props.Site + "<br>" + props['Address (Number, Street, Town, State, Zip)'] + "<br><br><b>Site Description:</b><br>" + props['Site Description'] +
-              "<br><br><b>History & Importance:</b><br>" + props['History and Importance to Project and Community'] + "<br>" + imgContent + "</div>");
+            chapterContent.push("<div class='story' data-point='" + props.Y + "," + props.X + "'><br><b><h2>" + props.Name + "</h2></b><span class='br'></span><h3>" + props.Category + "<span class='br'></span>" + props.Site + "<span class='br'></span>" + props['Address (Number, Street, Town, State, Zip)'] + "</h3><span class='brmedium'></span><b><h2>Site Description:</h2></b><span class='br'></span><h3>" + props['Site Description'] +
+              "</h3><span class='brmedium'></span><b><h2>History & Importance:</h2></b><span class='br'></span><h3>" + props['History and Importance to Project and Community'] + '</h3>' + imgContent + "</div>");
             // redefine the div
             info.innerHTML = chapterContent.join("<hr>");
           } else {
