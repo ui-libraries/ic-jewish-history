@@ -28,9 +28,6 @@
   <!-- for a collapsible sidebar -->
   <link rel="stylesheet" href="css/leaflet-sidebar.css" />
 
-  <!-- for a search button -->
-  <link rel='stylesheet' href='css/leaflet-search.css'>
-
   <!-- custom css styles go below -->
   <style>
     body {
@@ -49,6 +46,31 @@
     .lorem {
       font-style: italic;
       color: #AAA;
+    }
+
+    /* control the popup size and allow for scrolling of overflow */
+    .leaflet-popup-content-wrapper {
+      line-height: 10px;
+      border-radius: 2px;
+      height: 10 px;
+      max-height: 350px;
+      max-width: 350px;
+      overflow: auto;
+    }
+
+    .leaflet-popup {
+      position: absolute;
+      text-align: center;
+    }
+
+    .leaflet-popup-content {
+      min-width: 100 px !important;
+    }
+
+    /* resizes the images in the sidebar */
+    .resize {
+      width: 300px;
+      height: auto;
     }
 
     /* more css to come here */
@@ -98,6 +120,12 @@
           </select>
         </form>
 
+        <div id="sidebar-info" class="my-info-1">
+          <div id="content-info" class="contentinfo hide">
+            <p class="lorem">Apply some filters to see descriptive content.</p>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -112,7 +140,6 @@
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 
   <!-- d3js for requesting files into web application -->
-  <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.min.js"></script>
 
   <!-- jquery for easy access to divs -->
@@ -121,14 +148,8 @@
   <!-- for icon markers -->
   <script src="js/leaflet.extra-markers.min.js"></script>
 
-  <!-- for grouped layer control -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-groupedlayercontrol/0.6.1/leaflet.groupedlayercontrol.min.js"></script>
-
   <!-- for the collapsible sidebar -->
   <script src="js/leaflet-sidebar.js"></script>
-
-  <!-- for search button -->
-  <script src="js/leaflet-search.js"></script>
 
   <!-- custom javascript goes below -->
   <script>
@@ -208,6 +229,9 @@
     // define an empty layer group to hold filtered markers
     const selectedLayers = L.layerGroup().addTo(map);
 
+    // define the sidebar information
+    const info = document.getElementById("content-info");
+
     // use d3 to access and parse spreadsheet data
     d3.csv('data/IC_JewishHistory_Sample.csv').then(function(data) {
 
@@ -286,16 +310,43 @@
           // define the marker properties
           const props = layer.feature.properties;
 
+          // define the image content
+          var siteImage = props['Media (Site Image)'];
+              siteImage = siteImage || undefined;
+
+          var otherImage = props['Media (Other Image)'];
+              otherImage = otherImage || undefined;
+
+          if (siteImage != undefined && otherImage === undefined) {
+            var imgContent = "<br><img class='resize' src='" + props['Media (Site Image)'] + "'" + "/>";
+          } else if (siteImage === undefined && otherImage != undefined) {
+            var imgContent = "<br><img class='resize' src='" + props['Media (Other Image)'] + "'" + "/>";
+          } else {
+            var imgContent = "";
+          };
+
           // check if the selected chapter matches the marker category
           if (chapterSelected[0] == props.Category) {
             // and add it to the map in case of a match
             selectedLayers.addLayer(layer);
+            // push content to the chapterContent array
+            chapterContent.push("<div class='story' data-point='" + props.Y + "," + props.X + "'><br><b>" + props.Name + "</b><br>" + props.Category + "<br>" + props.Site + "<br>" + props['Address (Number, Street, Town, State, Zip)'] + "<br><br><b>Site Description:</b><br>" + props['Site Description'] +
+              "<br><br><b>History & Importance:</b><br>" + props['History and Importance to Project and Community'] + "<br>" + imgContent + "</div>");
+            // redefine the div
+            info.innerHTML = chapterContent.join("<hr>");
           } else if (chapterSelected[0] == 0) {
             // or add all if "All" is selected
             selectedLayers.addLayer(layer);
+            // push content to the chapterContent array
+            chapterContent.push("<div class='story' data-point='" + props.Y + "," + props.X + "'><br><b>" + props.Name + "</b><br>" + props.Category + "<br>" + props.Site + "<br>" + props['Address (Number, Street, Town, State, Zip)'] + "<br><br><b>Site Description:</b><br>" + props['Site Description'] +
+              "<br><br><b>History & Importance:</b><br>" + props['History and Importance to Project and Community'] + "<br>" + imgContent + "</div>");
+            // redefine the div
+            info.innerHTML = chapterContent.join("<hr>");
           } else {
             // or remove it from the map if there is no match
             selectedLayers.removeLayer(layer);
+            // empty the chapterContent array
+            chapterContent.length = 0;
           }
 
         });
