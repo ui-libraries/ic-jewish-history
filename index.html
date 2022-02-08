@@ -407,9 +407,47 @@
 
         });
 
+        // identify the lat,lng of the first story div in the sidebar
+        const firstStoryLat = $('.story')[0].getAttribute('data-point').split(',')[0];
+        const firstStoryLng = $('.story')[0].getAttribute('data-point').split(',')[1];
+        // define the desired zoom setting when going to a point of interest
+        const firstStoryZoom = 14;
+
+        // zoom to the marker connected to the story div
+        map.setView([firstStoryLat,firstStoryLng], firstStoryZoom);
+
       };
 
-    }
+    };
+
+    // detects a scroll event in the sidebar
+    $('.sidebar-content').on("scroll", function(e) {
+
+      // iterate through each story div in the sidebar
+      $('.story').each(function() {
+
+        // gets the horizontal line crossing the middle of the window
+        var midLine = $(window).height()/2;
+        // defines the vertical start of each story div
+        var divStart = $(this).offset().top;
+        // defines the vertical end of each story div
+        var divEnd = divStart + $(this)[0].offsetHeight;
+        // defines the latitude associated with the story div
+        var lat = $(this)[0].getAttribute('data-point').split(',')[0];
+        // defines the longitude associated with the story div
+        var lng = $(this)[0].getAttribute('data-point').split(',')[1];
+        // define the desired zoom setting when going to a point of interest
+        var zoom = 14;
+
+        // if the start and end of the div crosses the middle of the sidebar...
+        if (divStart < midLine && divEnd > midLine) {
+          // zoom to the marker connected to the story div
+          map.setView([lat,lng], zoom);
+        }
+
+      });
+
+    });
 
     // more javascript to come here
 
