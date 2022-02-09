@@ -53,7 +53,7 @@
       line-height: 10px;
       border-radius: 2px;
       height: 10 px;
-      max-height: 350px;
+      max-height: 300px;
       max-width: 350px;
       overflow: auto;
     }
@@ -287,6 +287,9 @@
     // define the sidebar information
     const info = document.getElementById("content-info");
 
+    // define an empty array to hold coordinates for matching
+    const scrollCoords = [];
+
     // use d3 to access and parse spreadsheet data
     d3.csv('data/IC_JewishHistory_Sample.csv').then(function(data) {
 
@@ -324,11 +327,22 @@
           });
         },
 
-        // on each marker, bind popup content
+        // on each marker...
         onEachFeature: function(feature, layer) {
+          // define the layer properties
           const props = feature.properties;
+          // bind popup content
           layer.bindPopup('<b><h2>' + props.Name + "</h2></b><span class='br'></span><h3>" + props.Category + '<hr>' + props.Site + "<span class='br'></span>" + props['Address (Number, Street, Town, State, Zip)'] + "</h3><span class='brmedium'></span><b><h2>Site Description:</h2></b><span class='br'></span><h3>" + props['Site Description'] +
-            "</h3><span class='brmedium'></span><b><h2>History & Importance:</h2></b><span class='br'></span><h3>" + props['History and Importance to Project and Community'] + '</h3>');
+            "</h3>");
+            //"<span class='brmedium'></span><b><h2>History & Importance:</h2></b><span class='br'></span><h3>" + props['History and Importance to Project and Community'] + '</h3>');
+          // change the cursor to a pointer on marker hover
+          layer.on('mouseover', function() {
+            $('.leaflet-container').css('cursor','pointer');
+          });
+          // change the cursor back to default on mouseout
+          layer.on('mouseout', function() {
+            $('.leaflet-container').css('cursor','');
+          });
         }
 
       });
@@ -336,19 +350,24 @@
       // initially, add all markers to the selectedLayers layer group
       selectedLayers.addLayer(markers);
 
-      // call the filterMarkers function on the markers
-      filterMarkers(markers);
+      // upon a dropdown menu submission...
+      $('#chapter-select')[0].onchange = function(e) {
+
+        // call the filterMarkers function on the markers
+        filterMarkers(markers);
+
+      };
 
       // call the scrollMarkers function on the markers
       scrollMarkers(markers);
+
+      // call the scrollOpenPopup function on the markers
+      scrollOpenPopup(markers);
 
     });
 
     // define the filterMarkers function
     function filterMarkers(markers) {
-
-      // upon a dropdown menu submission...
-      $('#chapter-select')[0].onchange = function(e) {
 
         // empty the chapterContent array
         chapterContent.length = 0;
@@ -427,20 +446,21 @@
 
           // if the first story coordinates match the marker coordinates...
           if (markerCoords[0] === firstStoryLng && markerCoords[1] === firstStoryLat) {
+
             // fire a click on the marker, opening the popup
             layer.fire('click');
+
+            // center the map on the marker
+            map.setView(layer.getLatLng(),14);
+            
           }
 
         });
 
-      };
-
     };
 
+    // define the scrollMarkers function
     function scrollMarkers(markers) {
-
-      // define an empty array to hold coordinates for matching
-      var scrollCoords = [];
 
       // detects a scroll event in the sidebar
       $('.sidebar-content').on("scroll", function(e) {
@@ -452,17 +472,17 @@
         $('.story').each(function() {
 
           // gets the horizontal line crossing the middle of the window
-          var midLine = $(window).height()/2;
+          const midLine = $(window).height()/2;
           // defines the vertical start of each story div
-          var divStart = $(this).offset().top;
+          const divStart = $(this).offset().top;
           // defines the vertical end of each story div
-          var divEnd = divStart + $(this)[0].offsetHeight;
+          const divEnd = divStart + $(this)[0].offsetHeight;
           // defines the latitude associated with the story div
-          var lat = $(this)[0].getAttribute('data-point').split(',')[0];
+          const lat = $(this)[0].getAttribute('data-point').split(',')[0];
           // defines the longitude associated with the story div
-          var lng = $(this)[0].getAttribute('data-point').split(',')[1];
+          const lng = $(this)[0].getAttribute('data-point').split(',')[1];
           // define the desired zoom setting when going to a point of interest
-          var zoom = 14;
+          const zoom = 14;
 
           // if the start and end of the div crosses the middle of the sidebar...
           if (divStart < midLine && divEnd > midLine) {
@@ -478,6 +498,11 @@
         });
 
       });
+
+    };
+
+    // define the scrollOpenPopup function
+    function scrollOpenPopup(markers) {
 
       // make a function that clicks the correct marker when scrolling stops
       var scrollTimeout = null;
