@@ -290,11 +290,33 @@
     // define an empty array to hold coordinates for matching
     const scrollCoords = [];
 
+    // define an empty array to hold the offset for the new map center
+    const centerDiff = [];
+
     // the following gets the approximate center of the visible map when the sidebar is open at zoom 14
     const winWidth = map.getBounds()._northEast.lng - map.getBounds()._southWest.lng;
     const winHalf = winWidth/2;
     const winThird = winWidth/3;
     const winDiff = (winHalf - winThird)/4;
+
+    // push the winDiff value to the empty array
+    centerDiff.push(winDiff);
+
+    // this listens for a window resize event and gets the approximate center of the visible map at zoom 14
+    window.addEventListener('resize', function () {
+
+      // empty the centerDiff array
+      centerDiff.length = 0;
+
+      const winWidth = map.getBounds()._northEast.lng - map.getBounds()._southWest.lng;
+      const winHalf = winWidth/2;
+      const winThird = winWidth/3;
+      const winDiff = (winHalf - winThird)/4;
+
+      // push the new winDiff value to the empty array
+      centerDiff.push(winDiff);
+
+    });
 
     // use d3 to access and parse spreadsheet data
     d3.csv('data/IC_JewishHistory_Sample.csv').then(function(data) {
@@ -456,8 +478,13 @@
             // fire a click on the marker, opening the popup
             layer.fire('click');
 
-            //map.setView(layer.getLatLng(),14);
+            // focus the map on the marker;
             map.setView([layer.getLatLng().lat,layer.getLatLng().lng - winDiff],14);
+
+            // refocus the map on the marker upon a change in the window size
+            window.addEventListener('resize', function () {
+              map.setView([layer.getLatLng().lat,layer.getLatLng().lng - centerDiff[0]],14);
+            });
 
           }
 
@@ -501,6 +528,19 @@
 
           }
 
+          // upon a change in the window size...
+          window.addEventListener('resize', function () {
+
+            // if the start and end of the div crosses the middle of the sidebar...
+            if (divStart < midLine && divEnd > midLine) {
+
+              // zoom to the marker connected to the story div
+              map.setView([lat,lng - centerDiff[0]],14);
+
+            }
+
+          });
+
         });
 
       });
@@ -541,22 +581,6 @@
       });
 
     };
-
-/*
-    // on a window resize event...
-    window.addEventListener('resize', getWidths);
-
-    // define a function to return the width of the screen and visible map
-    function getWidths() {
-
-      // gets the changed width of the window
-      const screenWidth = $(window).width();
-
-      // gets the approximate vertical center of the changed visible screen
-      const vizWidth = screenWidth/3*2;
-
-    };
-*/
 
     // more javascript to come here
 
