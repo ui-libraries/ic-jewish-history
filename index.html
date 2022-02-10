@@ -211,7 +211,7 @@
     // map options
     const options = {
       center: [41.66, -91.60], // center on Iowa City with coordinates
-      zoom: 12 // set initial zoom level to 8
+      zoom: 12 // set initial zoom level to 12
     };
 
     // instantiate and define a Leaflet map
@@ -289,6 +289,12 @@
 
     // define an empty array to hold coordinates for matching
     const scrollCoords = [];
+
+    // the following gets the approximate center of the visible map when the sidebar is open at zoom 14
+    const winWidth = map.getBounds()._northEast.lng - map.getBounds()._southWest.lng;
+    const winHalf = winWidth/2;
+    const winThird = winWidth/3;
+    const winDiff = (winHalf - winThird)/4;
 
     // use d3 to access and parse spreadsheet data
     d3.csv('data/IC_JewishHistory_Sample.csv').then(function(data) {
@@ -436,7 +442,7 @@
         const firstStoryZoom = 14;
 
         // zoom to the marker connected to the story div
-        map.setView([firstStoryLat,firstStoryLng], firstStoryZoom);
+        map.setView([firstStoryLat,firstStoryLng - winDiff], firstStoryZoom);
 
         // iterate through each marker
         markers.eachLayer(function(layer) {
@@ -450,9 +456,9 @@
             // fire a click on the marker, opening the popup
             layer.fire('click');
 
-            // center the map on the marker
-            map.setView(layer.getLatLng(),14);
-            
+            //map.setView(layer.getLatLng(),14);
+            map.setView([layer.getLatLng().lat,layer.getLatLng().lng - winDiff],14);
+
           }
 
         });
@@ -488,7 +494,7 @@
           if (divStart < midLine && divEnd > midLine) {
 
             // zoom to the marker connected to the story div
-            map.setView([lat,lng], zoom);
+            map.setView([lat,lng - winDiff], zoom);
 
             // push the story coordinates to the scrollCoords array
             scrollCoords.push(lng,lat);
@@ -535,6 +541,22 @@
       });
 
     };
+
+/*
+    // on a window resize event...
+    window.addEventListener('resize', getWidths);
+
+    // define a function to return the width of the screen and visible map
+    function getWidths() {
+
+      // gets the changed width of the window
+      const screenWidth = $(window).width();
+
+      // gets the approximate vertical center of the changed visible screen
+      const vizWidth = screenWidth/3*2;
+
+    };
+*/
 
     // more javascript to come here
 
