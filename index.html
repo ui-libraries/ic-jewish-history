@@ -318,6 +318,9 @@
 
     });
 
+    // define an empty array to hold the 'data-point' (coordinate) attribute of each story div
+    const points = [];
+
     // use d3 to access and parse spreadsheet data
     d3.csv('data/IC_JewishHistory_Sample.csv').then(function(data) {
 
@@ -492,8 +495,6 @@
 
     };
 
-    const points = [];
-
     // define the scrollMarkers function
     function scrollMarkers(markers) {
 
@@ -522,19 +523,20 @@
           // if the start and end of the div crosses the middle of the sidebar...
           if (divStart < midLine && divEnd > midLine) {
 
+            // narrow down the points array to the last two points in the list
             points.splice(0, points.length - 1);
 
+            // define a story div point
             const point = $(this)[0].getAttribute('data-point');
 
+            // push the point into the points array
             points.push(point);
 
+            // if the last point does not equal the point before it...
             if (points[0] != points[1]) {
               // zoom to the marker connected to the story div
               map.setView([lat,lng - winDiff], zoom);
-            }
-
-            // zoom to the marker connected to the story div
-            //map.setView([lat,lng - winDiff], zoom);
+            } // this condition prevents jarring associated with scrolling by waiting for a point change to reset the map view
 
             // push the story coordinates to the scrollCoords array
             scrollCoords.push(lng,lat);
