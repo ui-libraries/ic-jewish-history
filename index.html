@@ -492,6 +492,8 @@
 
     };
 
+    const points = [];
+
     // define the scrollMarkers function
     function scrollMarkers(markers) {
 
@@ -520,8 +522,19 @@
           // if the start and end of the div crosses the middle of the sidebar...
           if (divStart < midLine && divEnd > midLine) {
 
+            points.splice(0, points.length - 1);
+
+            const point = $(this)[0].getAttribute('data-point');
+
+            points.push(point);
+
+            if (points[0] != points[1]) {
+              // zoom to the marker connected to the story div
+              map.setView([lat,lng - winDiff], zoom);
+            }
+
             // zoom to the marker connected to the story div
-            map.setView([lat,lng - winDiff], zoom);
+            //map.setView([lat,lng - winDiff], zoom);
 
             // push the story coordinates to the scrollCoords array
             scrollCoords.push(lng,lat);
