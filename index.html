@@ -337,11 +337,36 @@
     // define an empty array to hold coordinates for matching
     const scrollCoords = [];
 
+    // define an empty array to hold the offset for the new map center
+    const centerDiff = [];
+
     // the following gets the approximate center of the visible map when the sidebar is open at zoom 14
     const winWidth = map.getBounds()._northEast.lng - map.getBounds()._southWest.lng;
     const winHalf = winWidth/2;
     const winThird = winWidth/3;
     const winDiff = (winHalf - winThird)/4;
+
+    // push the winDiff value to the empty array
+    centerDiff.push(winDiff);
+
+    // this listens for a window resize event and gets the approximate center of the visible map at zoom 14
+    window.addEventListener('resize', function () {
+
+      // empty the centerDiff array
+      centerDiff.length = 0;
+
+      const winWidth = map.getBounds()._northEast.lng - map.getBounds()._southWest.lng;
+      const winHalf = winWidth/2;
+      const winThird = winWidth/3;
+      const winDiff = (winHalf - winThird)/4;
+
+      // push the new winDiff value to the empty array
+      centerDiff.push(winDiff);
+
+    });
+
+    // define an empty array to hold the 'data-point' (coordinate) attribute of each story div
+    const points = [];
 
     // use d3 to access and parse spreadsheet data
     d3.csv('data/ic_jewish_history_sample_2.csv').then(function(data) {
@@ -547,13 +572,38 @@
           // if the start and end of the div crosses the middle of the sidebar...
           if (divStart < midLine && divEnd > midLine) {
 
-            // zoom to the marker connected to the story div
-            map.setView([lat,lng - winDiff], zoom);
+            // narrow down the points array to the last two points in the list
+            points.splice(0, points.length - 1);
+
+            // define a story div point
+            const point = $(this)[0].getAttribute('data-point');
+
+            // push the point into the points array
+            points.push(point);
+
+            // if the last point does not equal the point before it...
+            if (points[0] != points[1]) {
+              // zoom to the marker connected to the story div
+              map.setView([lat,lng - winDiff], zoom);
+            } // this condition prevents jarring associated with scrolling by waiting for a point change to reset the map view
 
             // push the story coordinates to the scrollCoords array
             scrollCoords.push(lng,lat);
 
           }
+
+          // upon a change in the window size...
+          window.addEventListener('resize', function () {
+
+            // if the start and end of the div crosses the middle of the sidebar...
+            if (divStart < midLine && divEnd > midLine) {
+
+              // zoom to the marker connected to the story div
+              map.setView([lat,lng - centerDiff[0]],14);
+
+            }
+
+          });
 
         });
 
@@ -601,22 +651,6 @@
       });
 
     };
-
-/*
-    // on a window resize event...
-    window.addEventListener('resize', getWidths);
-
-    // define a function to return the width of the screen and visible map
-    function getWidths() {
-
-      // gets the changed width of the window
-      const screenWidth = $(window).width();
-
-      // gets the approximate vertical center of the changed visible screen
-      const vizWidth = screenWidth/3*2;
-
-    };
-*/
 
     // more javascript to come here
 
