@@ -161,17 +161,19 @@
         <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm">
           <select id="chapter-select" class="div-toggle" data-target=".my-info-1">
             <option value="0" selected="selected">All</option>
-            <option value="Community Organization" data-show=".communityorganization">Community Organization</option>
-            <option value="Religious Organization" data-show=".religiousorganization">Religious Organization</option>
-            <option value="Student Organization" data-show=".studentorganization">Student Organization</option>
-            <option value="Other Organization" data-show=".otherorganization">Other Organization</option>
-            <option value="Academic" data-show=".academic">Academic</option>
             <option value="Activist" data-show=".activist">Activist</option>
+            <option value="Academic" data-show=".academic">Academic</option>
+            <option value="Artist/Author/Filmmaker" data-show=".artistauthorfilmmaker">Artist/Author/Filmmaker</option>
+            <option value="Business" data-show=".business">Business</option>
             <option value="Family" data-show=".family">Family</option>
             <option value="Holocaust Survivor" data-show=".holocaustsurvivor">Holocaust Survivor</option>
             <option value="Politician/Government Officer" data-show=".politiciangovernmentofficer">Politician/Government Officer</option>
+            <option value="Religious Organization" data-show=".religiousorganization">Religious Organization</option>
+            <option value="Community Organization" data-show=".communityorganization">Community Organization</option>
+            <option value="Student Organization" data-show=".studentorganization">Student Organization</option>
+            <option value="Other Organization" data-show=".otherorganization">Other Organization</option>
+            <option value="Synagogue" data-show=".synagogue">Synagogue</option>
             <option value="Other Person" data-show=".otherperson">Other Person</option>
-            <option value="Business" data-show=".business">Business</option>
           </select>
         </form>
 
@@ -235,6 +237,14 @@
     sidebar.open('home');
 
     // define markers for each category
+    // academics
+    const academicMarker = L.ExtraMarkers.icon({
+      icon: 'fa-graduation-cap',
+      markerColor: 'black',
+      shape: 'square',
+      prefix: 'fas'
+    });
+
     // activists
     const activistMarker = L.ExtraMarkers.icon({
       icon: 'fa-handshake',
@@ -243,10 +253,34 @@
       prefix: 'far'
     });
 
+    // artists
+    const artistMarker = L.ExtraMarkers.icon({
+      icon: 'fa-bookmark',
+      markerColor: 'purple',
+      shape: 'square',
+      prefix: 'fas'
+    });
+
+    // businesses
+    const businessMarker = L.ExtraMarkers.icon({
+      icon: 'fa-briefcase',
+      markerColor: 'orange',
+      shape: 'square',
+      prefix: 'fas'
+    });
+
     // religious orgs
     const religiousMarker = L.ExtraMarkers.icon({
       icon: 'fa-star-of-david',
       markerColor: 'blue',
+      shape: 'square',
+      prefix: 'fas'
+    });
+
+    // student orgs
+    const studentMarker = L.ExtraMarkers.icon({
+      icon: 'fa-university',
+      markerColor: 'cyan',
       shape: 'square',
       prefix: 'fas'
     });
@@ -259,6 +293,14 @@
       prefix: 'fab'
     });
 
+    // synagogue
+    const synagogueMarker = L.ExtraMarkers.icon({
+      icon: 'fa-synagogue',
+      markerColor: 'violet',
+      shape: 'square',
+      prefix: 'fas'
+    });
+
     // creates a red marker with a question mark icon
     const queryMarker = L.ExtraMarkers.icon({
       icon: 'fa-question-circle',
@@ -269,9 +311,14 @@
 
     // define a function to get the correct icon
     function getIcon(d) {
-      return d === "Holocaust Survivor" ? survivorMarker :
+      return d === "Academic" ? academicMarker :
         d === "Activist" ? activistMarker :
+        d === "Artist/Author/Filmmaker" ? artistMarker:
+        d === "Business" ? businessMarker:
+        d === "Holocaust Survivor" ? survivorMarker :
         d === "Religious Organization" ? religiousMarker :
+        d === "Student Organization" ? studentMarker:
+        d === "Synagogue" ? synagogueMarker:
         queryMarker;
     };
 
@@ -297,7 +344,7 @@
     const winDiff = (winHalf - winThird)/4;
 
     // use d3 to access and parse spreadsheet data
-    d3.csv('data/IC_JewishHistory_Sample.csv').then(function(data) {
+    d3.csv('data/ic_jewish_history_sample_2.csv').then(function(data) {
 
       // make an empty geoJSON object
       markersGeoJSON = {
@@ -451,13 +498,20 @@
           const markerCoords = layer.feature.geometry.coordinates;
 
           // if the first story coordinates match the marker coordinates...
+          // IF TWO ENTRIES HAVE THE SAME LOCATION MAKE SURE THE COORDINATES OF ONE ARE ONE DIGIT OFF
           if (markerCoords[0] === firstStoryLng && markerCoords[1] === firstStoryLat) {
 
             // fire a click on the marker, opening the popup
             layer.fire('click');
 
+            layer.setZIndexOffset(1000);
+
             //map.setView(layer.getLatLng(),14);
             map.setView([layer.getLatLng().lat,layer.getLatLng().lng - winDiff],14);
+
+          } else {
+
+            layer.setZIndexOffset(0);
 
           }
 
@@ -531,6 +585,12 @@
 
                 // fire a click on the marker, opening the popup
                 layer.fire('click');
+
+                layer.setZIndexOffset(1000);
+
+              } else {
+
+                layer.setZIndexOffset(0);
 
               }
 
