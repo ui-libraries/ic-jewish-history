@@ -547,6 +547,8 @@
     // define the scrollMarkers function
     function scrollMarkers(markers) {
 
+      var scrollTimeout = null;
+
       // detects a scroll event in the sidebar
       $('.sidebar-content').on("scroll", function(e) {
 
@@ -583,8 +585,16 @@
 
             // if the last point does not equal the point before it...
             if (points[0] != points[1]) {
-              // zoom to the marker connected to the story div
-              map.setView([lat,lng - winDiff], zoom);
+
+              if (scrollTimeout) clearTimeout(scrollTimeout);
+
+              scrollTimeout = setTimeout(function() {
+
+                // zoom to the marker connected to the story div
+                map.setView([lat,lng - winDiff], zoom);
+
+              }, 200);
+
             } // this condition prevents jarring associated with scrolling by waiting for a point change to reset the map view
 
             // push the story coordinates to the scrollCoords array
