@@ -173,7 +173,7 @@
             <option value="Student Organization" data-show=".studentorganization">Student Organization</option>
             <option value="Other Organization" data-show=".otherorganization">Other Organization</option>
             <option value="Synagogue" data-show=".synagogue">Synagogue</option>
-            <option value="Other Person" data-show=".otherperson">Other Person</option>
+            <option value="Other Person of Note" data-show=".otherperson">Other Person of Note</option>
           </select>
         </form>
 
@@ -301,6 +301,14 @@
       prefix: 'fas'
     });
 
+    // other person of note
+    const otherPersonMarker = L.ExtraMarkers.icon({
+      icon: 'fa-user',
+      markerColor: 'blue-dark',
+      shape: 'square',
+      prefix: 'fa'
+    });
+
     // creates a red marker with a question mark icon
     const queryMarker = L.ExtraMarkers.icon({
       icon: 'fa-question-circle',
@@ -319,6 +327,7 @@
         d === "Religious Organization" ? religiousMarker :
         d === "Student Organization" ? studentMarker:
         d === "Synagogue" ? synagogueMarker:
+        d === "Other Person of Note" ? otherPersonMarker:
         queryMarker;
     };
 
@@ -411,7 +420,7 @@
           const props = feature.properties;
           // bind popup content
           layer.bindPopup('<b><h2>' + props.Name + "</h2></b><span class='br'></span><h3>" + props.Category + '<hr>' + props.Site + "<span class='br'></span>" + props['Address (Number, Street, Town, State, Zip)'] + "</h3><span class='brmedium'></span><b><h2>Site Description:</h2></b><span class='br'></span><h3>" + props['Site Description'] +
-            "</h3>");
+          '<span class="brmedium"></span><a href="' + props['Archive Link'] + '" target="_blank">Archive Link' + "</h3>");
             //"<span class='brmedium'></span><b><h2>History & Importance:</h2></b><span class='br'></span><h3>" + props['History and Importance to Project and Community'] + '</h3>');
           // change the cursor to a pointer on marker hover
           layer.on('mouseover', function() {
